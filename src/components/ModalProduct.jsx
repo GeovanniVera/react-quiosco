@@ -1,11 +1,21 @@
-import { useState } from "react"
+import { useState , useEffect } from "react"
 import useQuiosco from "../hooks/useQuiosco"
 import { formatQuantity } from "../helpers"
 export default function ModalProduct() {
 
-    const { handleClickModal, product , handleAddOrder } = useQuiosco()
+    const { handleClickModal, product , handleAddOrder, order } = useQuiosco()
     
     const [quantity, setQuantity] = useState(1)
+    const [edit, setEdit] = useState(false)
+    
+
+    useEffect (() => {
+        if(order.some(orderState => orderState.id === product.id )){
+            const productEdit = order.filter(orderState => orderState.id === product.id)[0]
+            setQuantity(productEdit.quantity)
+            setEdit(true)
+        }
+    }, [order])
     
     const handlePlusQuantity = () => {
         if (quantity < 5) {
@@ -25,8 +35,8 @@ export default function ModalProduct() {
             <div className="md:w-1/3">
                 <img
                     className="rounded"
-                    src={`/img/${product.imagen}.jpg`}
-                    alt={`Imagen Alternativa ${product.nombre}`}
+                    src={`/img/${product.image}.jpg`}
+                    alt={`Imagen Alternativa ${product.name}`}
 
                 />
 
@@ -51,13 +61,13 @@ export default function ModalProduct() {
                     <h1
                         className="text-3xl font-bold text-yellow-800"
                     >
-                        {product.nombre}
+                        {product.name}
                     </h1>
                     {/* Cantidad */}
                     <p
                         className="mt-5 font-black text-5xl text-amber-500 "
                     >
-                        {formatQuantity(product.precio)}
+                        {formatQuantity(product.price)}
                     </p>
                     {/* Botones */}
 
@@ -102,11 +112,12 @@ export default function ModalProduct() {
                     <button
                         type="button"
                         onClick={() => {
-                            handleAddOrder({...product , quantity})
+                            handleAddOrder({...product , quantity}),
+                            handleClickModal()
                         }}
                         className="bg-amber-500 hover:bg-amber-700 px-5 py-2 mt-6 text-white font-bold uppercase cursor-pointer rounded"
                     >
-                        Añadir al pedido
+                        {edit ? 'Guardar Cambios' : 'Añadir al pedido'}
                     </button>
                 </div>
             </div>
